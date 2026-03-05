@@ -64,13 +64,13 @@ extern void irq15(void);  // IRQ15 - ATA Secondary
 // Functions for direct hardware communication:
 
 // writes one byte of data to a specific hardware I/O port
-static inline void outb(uint16_t port, uint8_t value)
+void outb(uint16_t port, uint8_t value)
 {
     __asm__ volatile ("outb %0, %1" : : "a"(value), "Nd"(port));
 }
 
 // read one byte of data from a specific hardware I/O port 
-static inline uint8_t inb(uint16_t port)
+uint8_t inb(uint16_t port)
 {
     uint8_t value;
     __asm__ volatile ("inb %1, %0" : "=a"(value) : "Nd"(port));
@@ -184,9 +184,7 @@ void isr_handler(struct interrupt_frame *frame) // handles the interrupt service
 
             char c = ps2_to_ascii(scancode); // convert the ps2 scancode to ascii character
             if (c != 0) {
-                putchar('\b'); // artificial backspace to remove the previous cursor
                 putchar(c); // write the ascii character to the screen
-                printf("_"); // write a new cursor
             }
         }
 

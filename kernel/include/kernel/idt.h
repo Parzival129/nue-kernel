@@ -47,4 +47,6 @@ void idt_install(void);
 // High-level interrupt handler
 void isr_handler(struct interrupt_frame *frame);
 
+void outb(uint16_t port, uint8_t value);
+
 #endif

@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <kernel/tty.h>
+#include <kernel/idt.h>
 
 #include "vga.h"
 
@@ -90,6 +91,18 @@ void terminal_initialize(void) {
 	}
 }
 
+// moves the cusor to the given cursor location
+// column, row
+void update_cursor(size_t x, size_t y)
+{
+	uint16_t pos = y * VGA_WIDTH + x;
+	// x86 assembly to perform change
+	outb(0x3D4, 0x0F);
+	outb(0x3D5, (uint8_t) (pos & 0xFF));
+	outb(0x3D4, 0x0E);
+	outb(0x3D5, (uint8_t) ((pos >> 8) & 0xFF));
+}
+
 void terminal_setcolor(uint8_t color) {
 	terminal_color = color;
 }
@@ -148,8 +161,10 @@ void terminal_putchar(char c) {
 }
 
 void terminal_write(const char* data, size_t size) {
-	for (size_t i = 0; i < size; i++)
+	for (size_t i = 0; i < size; i++) {
 		terminal_putchar(data[i]);
+		update_cursor(terminal_column, terminal_row); // moves the cursor to the new location after placing character
+	}
 }
 
 void terminal_writestring(const char* data) {
