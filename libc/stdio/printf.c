@@ -62,13 +62,39 @@ int printf(const char* restrict format, ...) {
 				return -1;
 			written += len;
 
-		// } else if (*format == 'd') {
-		// 	format++;
-		// 	int n = va_arg(parameters, int);
-		// 	char buf[12];
-		// 	if (n < 0) {
-				
-		// 	}
+		} else if (*format == 'd') {
+			format++;
+			int n = va_arg(parameters, int);
+			unsigned int magnitude;
+			if (n < 0)
+				magnitude = (unsigned int) (-(n + 1)) + 1;
+			else
+				magnitude = (unsigned int) n;
+			char buf[12];
+			int i = 0;
+			if (magnitude == 0) {
+				buf[i++] = '0';
+			} else {
+				char tmp[12];
+				int j = 0;
+				while (magnitude > 0) {
+					tmp[j++] = '0' + (magnitude % 10);
+					magnitude /= 10;
+				}
+				while (j > 0) {
+					buf[i++] = tmp[--j];
+				}
+			}
+			size_t len = (size_t) i + (n < 0 ? 1u : 0u);
+			if (maxrem < len) {
+				return -1;
+			}
+			if (n < 0 && !print("-", 1))
+				return -1;
+			if (!print(buf, i))
+				return -1;
+			written += len;
+
 
 		// include functionality for hexademical, specifically for IRQ handler logging
 		// for *format u and x
@@ -96,6 +122,7 @@ int printf(const char* restrict format, ...) {
 			if (!print(buf, i))
 				return -1;
 			written += i;
+
 		} else if (*format == 'x') {
 			format++;
 			unsigned int n = va_arg(parameters, unsigned int);

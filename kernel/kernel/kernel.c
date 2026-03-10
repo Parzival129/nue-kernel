@@ -16,6 +16,7 @@ void kernel_main(void) {
                                            
 	printf("booted\n\n");
 	printf("READY\n>");
+	printf("%d", -100);
 
 	// Tests the IDT exception handler with a division by 0 exception
 	// __asm__ volatile ("movl $1, %%eax; xorl %%edx, %%edx; movl $0, %%ecx; divl %%ecx" ::: "eax", "ecx", "edx");
