@@ -154,7 +154,7 @@
   ---
   Recommended Next Steps (in order)
 
-  1. Freestanding printf — The kernel uses printf but links -lk. You likely need a proper kernel printf that calls terminal_putchar directly, handling %s, %d, %u, %x
+  1. Freestanding printf — The kernel uses ar 16printf but links -lk. You likely need a proper kernel printf that calls terminal_putchar directly, handling %s, %d, %u, %x
   at minimum.
   2. Command-line shell — Buffer keyboard input in isr_handler (IRQ1) into a line buffer, echo it, and on \n dispatch to a command parser. This gives you an
   interactive kernel shell.

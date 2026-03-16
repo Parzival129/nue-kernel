@@ -7,7 +7,7 @@ ENTRY(_start)
 SECTIONS
 {
 	/* Begin putting sections at 1 MiB, a conventional place for kernels to be
-	   loaded at by the bootloader. */
+	   loaded at by the bootloader. Ensures that no BIOS, legacy VGA, or memory mapped IO is tampered with */
 	. = 1M;
 
 	/* First put the multiboot header, as it is required to be put very early
@@ -19,13 +19,13 @@ SECTIONS
 		*(.text)
 	}
 
-	/* Read-only data. */
+	/* Read-only data. Constant variables that will never change while the kernel is running*/
 	.rodata BLOCK(4K) : ALIGN(4K)
 	{
 		*(.rodata)
 	}
 
-	/* Read-write data (initialized) */
+	/* Read-write data (initialized), global / static variables that already have a value when the kernel starts */
 	.data BLOCK(4K) : ALIGN(4K)
 	{
 		*(.data)
@@ -36,6 +36,7 @@ SECTIONS
 	{
 		*(COMMON)
 		*(.bss)
+		_kernel_end /* indicate where safe memory begins for programs, not affecting the kernel
 	}
 
 	/* The compiler may produce other sections, put them in the proper place in
