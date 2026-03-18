@@ -1,4 +1,5 @@
 #include <kernel/idt.h>
+#include <kernel/tty.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -169,7 +170,7 @@ void isr_handler(struct interrupt_frame* frame) // handles the interrupt service
             "Reserved"
         };
 
-        printf("[EXCEPTION] #%u: %s (err=0x%x)\n",
+        printf("[EXCEPTION] #%lu: %s (err=0x%lx)\n",
             frame->int_no,
             exception_messages[frame->int_no],
             frame->err_code);

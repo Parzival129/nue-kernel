@@ -18,7 +18,7 @@ struct stat {
     int st_mode;
 };
 
-void* _sbrk(intptr_t increment) // move heap pointer
+void* sbrk(intptr_t increment) // move heap pointer
 {
     uint8_t* prev = heap_ptr; // assign the current heap pointer to a temporary prev variable
     if (heap_ptr + increment > _kernel_end + HEAP_MAX) { // remember to start at _kernel_end memory address
@@ -28,7 +28,7 @@ void* _sbrk(intptr_t increment) // move heap pointer
     return (void*)prev; // return the previous position as the start of the new block
 }
 
-int _write(int fd, const char* buf, int len)
+int write(int fd, const char* buf, int len)
 { // write to the terminal
     if (fd == 1 || fd == 2) {
         terminal_write(buf, (size_t)len);
@@ -38,7 +38,7 @@ int _write(int fd, const char* buf, int len)
     return -1; // error
 }
 
-int _read(int fd, char* buf, int len)
+int read(int fd, char* buf, int len)
 {
     (void)fd; (void)buf; (void)len; // void unused args
     return -1; // not necessary at the moment since idt writes directly to the screen buffer, not file descriptor
@@ -52,13 +52,13 @@ __attribute__((noreturn)) void _exit(int status)
     __builtin_unreachable();
 }
 
-int _close(int fd)
+int close(int fd)
 { // close a file descriptor
     (void)fd;
     return -1; // has nothing to close at the moment
 }
 
-int _fstat(int fd, struct stat* st)
+int fstat(int fd, struct stat* st)
 {
     (void)fd;
     memset(st, 0, sizeof(struct stat));
@@ -66,7 +66,7 @@ int _fstat(int fd, struct stat* st)
     return 0;
 }
 
-int _isatty(int fd)
+int isatty(int fd)
 { // checks if a file descriptor is tty
     if (fd == 0 || fd == 1 || fd == 2) {
         return 1;
@@ -74,8 +74,19 @@ int _isatty(int fd)
     return 0;
 }
 
-int _lseek(int fd, int offset, int whence)
+int lseek(int fd, int offset, int whence)
 { // can't seek on a character device like i386
     (void)fd; (void)offset; (void)whence;
     return -1;
+}
+
+int kill(int pid, int sig)
+{ // no processes to signal in a single-task kernel
+    (void)pid; (void)sig;
+    return -1;
+}
+
+int getpid(void)
+{ // always return 1, we're the only process
+    return 1;
 }

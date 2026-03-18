@@ -5,7 +5,9 @@
 #include <kernel/idt.h>
 
 void kernel_main(void) {
-	terminal_initialize(); printf("[OK] terminal initialized\n");
+	terminal_initialize();
+	setvbuf(stdout, NULL, _IONBF, 0); // disable stdout buffering so putchar writes immediately
+	printf("[OK] terminal initialized\n");
 	gdt_install(); printf("[OK] gdt installed\n");
 	idt_install(); printf("[OK] idt installed\n");
 

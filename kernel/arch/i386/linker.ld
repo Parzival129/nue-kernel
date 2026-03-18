@@ -36,7 +36,8 @@ SECTIONS
 	{
 		*(COMMON)
 		*(.bss)
-		_kernel_end /* indicate where safe memory begins for programs, not affecting the kernel
+		. = ALIGN(4k);
+		_kernel_end = .;  /* indicate where safe memory begins for programs, not affecting the kernel */
 	}
 
 	/* The compiler may produce other sections, put them in the proper place in
