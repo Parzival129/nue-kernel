@@ -18,3 +18,4 @@ To be implemented:
 - port cool software (C compiler? text editor)
 - gui graphics?
 - basic networking?
+- someday POSIX compliance?
