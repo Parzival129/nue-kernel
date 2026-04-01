@@ -196,8 +196,18 @@ void isr_handler(struct interrupt_frame* frame) // handles the interrupt service
                     if (cli_buffer_index == 4 && memcmp(cli_buffer, "info", 4) == 0) {
                         printf("Nue Kernel v0.1\n");
                     }
+                    if (cli_buffer_index == 5 && memcmp(cli_buffer, "clear", 5) == 0) {
+                        for (int i = 0; i < 80 * 25; i++) {
+                            printf(" ");
+                        }
+                        cli_buffer[0] = '\0';
+                    }
                     if (cli_buffer_index == 4 && memcmp(cli_buffer, "help", 4) == 0) {
                         printf("There is no help here..\n");
+                    }
+                    if (cli_buffer_index == 7 && memcmp(cli_buffer, "reboot?", 7) == 0) {
+                        uint64_t null_idtr = 0;
+                        asm("xor %%eax, %%eax; lidt %0; int3" ::"m"(null_idtr));
                     }
 
                     else if (cli_buffer[0] != '\0') { // if the command buffer is not empty, then throw an error
