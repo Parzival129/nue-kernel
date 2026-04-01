@@ -195,7 +195,12 @@ void isr_handler(struct interrupt_frame* frame) // handles the interrupt service
                     // Refactor this into seperate command router
                     if (cli_buffer_index == 4 && memcmp(cli_buffer, "info", 4) == 0) {
                         printf("Nue Kernel v0.1\n");
-                    } else if (cli_buffer[0] != '\0') { // if the command buffer is not empty, then throw an error
+                    }
+                    if (cli_buffer_index == 4 && memcmp(cli_buffer, "help", 4) == 0) {
+                        printf("There is no help here..\n");
+                    }
+
+                    else if (cli_buffer[0] != '\0') { // if the command buffer is not empty, then throw an error
                         printf("command '%s' not recognized\n", cli_buffer);
                     }
 
