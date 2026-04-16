@@ -2,6 +2,7 @@
 
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
+#include <kernel/shell.h>
 #include <kernel/tty.h>
 
 void kernel_main(uint32_t multiboot_info_addr) // accepts multiboot info address from boot.S
@@ -20,7 +21,8 @@ void kernel_main(uint32_t multiboot_info_addr) // accepts multiboot info address
     printf("/_//_/\\_,_/\\__/ /_/\\_\\\\__/_/ /_//_/\\__/_/  \n");
 
     printf("booted\n\n");
-    printf("READY\n>");
+    printf("READY\n");
+    shell_init();
 
     // Tests the IDT exception handler with a division by 0 exception
     // __asm__ volatile ("movl $1, %%eax; xorl %%edx, %%edx; movl $0, %%ecx; divl %%ecx" ::: "eax", "ecx", "edx");

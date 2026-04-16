@@ -1,16 +1,13 @@
 #include <kernel/idt.h>
+#include <kernel/shell.h>
 #include <kernel/tty.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <string.h>
 
 struct idt_entry idt[NO_IDT_ENTRIES]; // 256 descriptors to fulfill i386 arch.
 struct idt_ptr ip; // pointer to idt
 
 extern void idt_init(uint32_t);
-
-char cli_buffer[256]; // buffer for cli commands
-uint8_t cli_buffer_index = 0;
 
 // Exception and interrupt handler stubs, based off i386 standards
 // Implemented in isr.s
@@ -185,49 +182,9 @@ void isr_handler(struct interrupt_frame* frame) // handles the interrupt service
 
         if (irq == 1) { // if it is keyboard input
             uint8_t scancode = inb(0x60);
-
             char c = ps2_to_ascii(scancode); // convert the ps2 scancode to ascii character
             if (c != 0) {
-                if (c == '\n') { // when the user presses enter key
-                    putchar(c); // write the newline to the screen
-                    cli_buffer[cli_buffer_index] = '\0'; // terminate cli command buffer
-
-                    // Refactor this into seperate command router
-                    if (cli_buffer_index == 4 && memcmp(cli_buffer, "info", 4) == 0) {
-                        printf("Nue Kernel v0.1\n");
-                    }
-                    if (cli_buffer_index == 5 && memcmp(cli_buffer, "clear", 5) == 0) {
-                        for (int i = 0; i < 80 * 25; i++) {
-                            printf(" ");
-                        }
-                        cli_buffer[0] = '\0';
-                    }
-                    if (cli_buffer_index == 4 && memcmp(cli_buffer, "help", 4) == 0) {
-                        printf("There is no help here..\n");
-                    }
-                    if (cli_buffer_index == 7 && memcmp(cli_buffer, "reboot?", 7) == 0) {
-                        uint64_t null_idtr = 0;
-                        asm("xor %%eax, %%eax; lidt %0; int3" ::"m"(null_idtr));
-                    }
-
-                    else if (cli_buffer[0] != '\0') { // if the command buffer is not empty, then throw an error
-                        printf("command '%s' not recognized\n", cli_buffer);
-                    }
-
-                    cli_buffer_index = 0; // reset after enter pressed
-                    cli_buffer[0] = '\0';
-                    printf(">"); // new prompt
-                } else if (c == '\b') {
-                    if (cli_buffer_index > 0) {
-                        cli_buffer_index--;
-                        cli_buffer[cli_buffer_index] = '\0';
-                        putchar(c); // update the screen to erase the last character
-                    }
-                } else if (cli_buffer_index < sizeof(cli_buffer) - 1) {
-                    cli_buffer[cli_buffer_index++] = c;
-                    cli_buffer[cli_buffer_index] = '\0';
-                    putchar(c); // write the ascii character to the screen
-                }
+                shell_on_char(c);
             }
         }
 
