@@ -3,6 +3,7 @@
 #include <kernel/tty.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <string.h> // test comment to test computer push
 
 struct idt_entry idt[NO_IDT_ENTRIES]; // 256 descriptors to fulfill i386 arch.
 struct idt_ptr ip; // pointer to idt
