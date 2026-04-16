@@ -1,4 +1,4 @@
-FROM ubuntu:24.04 AS toolchain
+FROM --platform=linux/amd64 ubuntu:24.04 AS toolchain
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -63,12 +63,13 @@ RUN wget -q ftp://sourceware.org/pub/newlib/newlib-4.4.0.20231231.tar.gz \
     && ../newlib-4.4.0.20231231/configure \
         --target=$TARGET \
         --prefix=$PREFIX \
+        --disable-libgloss \
     && make -j$(nproc) \
     && make install \
     && cd /tmp && rm -rf src
 
 # --- Final stage (smaller image) ---
-FROM ubuntu:24.04
+FROM --platform=linux/amd64 ubuntu:24.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 

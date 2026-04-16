@@ -1,0 +1,3 @@
+to build: ./docker-build.sh build
+to run: ./docker-build.sh run
+to exit (from another terminal): docker kill $(docker ps -q)
