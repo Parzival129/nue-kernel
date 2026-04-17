@@ -6,6 +6,7 @@ uint8_t* bitmap_addr = (uint8_t*)(&_kernel_end); // where is the first available
 
 uint32_t num_frames = 0;
 uint32_t bitmap_size_in_bytes = 0;
+uint32_t free_frames = 0;
 
 void PMM_initialize(multiboot_info_t* mbi) {
 
@@ -78,6 +79,19 @@ void PMM_initialize(multiboot_info_t* mbi) {
         current_addr = current_addr + (8 * 4096);
     }
 
+    // Sets the initial free frame count
+    uint8_t* current_byte = bitmap_addr;
+    while (current_byte < bitmap_addr + bitmap_size_in_bytes) { // iterate through the bytes of the bitmap
+        if (*current_byte != 0xFF) { // two layer search method, no need to search within the byte itself if it already is all unavailable (1)
+            for (int i = 0; i < 8; i++) { // iterate through each bit
+                if (!(*current_byte & (1 << i))) { // if the bit is 0, hence that frame is free
+                    free_frames++;
+                }
+            }
+        }
+        current_byte++;
+    }
+
 }
 
 uint32_t pmm_alloc_frame(void) {
@@ -88,6 +102,7 @@ uint32_t pmm_alloc_frame(void) {
                 if (!(*current_byte & (1 << i))) { // if the bit is 0
                     uint32_t frame = (current_byte - bitmap_addr) * 8 + i; // byte offset into bitmap * 8 bits + bit index = frame number
                     *current_byte |= (1 << i); // mark frame as used
+                    free_frames--;
                     return frame * 4096; // return physical address
                 }
             }
@@ -100,12 +115,13 @@ uint32_t pmm_alloc_frame(void) {
 void pmm_free_frame(uint32_t frame_addr) { // free a frame
     uint32_t frame = frame_addr / 4096; // find the frame #
     uint32_t byte_index = frame / 8; // get the byte index in the bitmap
-    uint8_t bit_index = frame % 8; // get the bit index of the bit in the bitmap
+    uint32_t bit_index = frame % 8; // get the bit index of the bit in the bitmap
     bitmap_addr[byte_index] &= ~(1 << bit_index); // free the frame by setting that frame bit to 0 in the bitmap
+    free_frames++;
 }
 uint32_t pmm_get_free_frame_count(void) {
-
+    return free_frames;
 }
 uint32_t pmm_get_total_frame_count(void) {
-
+    return num_frames;
 }
