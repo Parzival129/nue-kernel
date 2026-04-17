@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <kernel/pmm.h>
 
 extern uint32_t _kernel_end; // Linked finds the address of the kernel end
@@ -15,7 +16,7 @@ void PMM_initialize(multiboot_info_t* mbi) {
     multiboot_mmap_entry_t* entry = (multiboot_mmap_entry_t*)mbi->mmap_addr; // identify first entry of mmap entries
     uint8_t* end = (uint8_t*)mbi->mmap_addr + mbi->mmap_length; // identify where the mmap entries end for the sake of looping through
 
-    while (entry < end) {
+    while ((uint8_t*)entry < end) {
         if (entry->type == 1) { // if the current entry is useable
             if (entry->addr + entry->len > highest_address) {
                 highest_address = entry->addr + entry->len; // updates the currernt highest available address that RAM reaches
@@ -30,7 +31,7 @@ void PMM_initialize(multiboot_info_t* mbi) {
     memset(bitmap_addr, 0xFF, bitmap_size_in_bytes); // Initializes the bitmap with all frames defaulting to 1 ( NOT useable )
 
     entry = (multiboot_mmap_entry_t*)mbi->mmap_addr;
-    while (entry < end) { // KEY POINT: In the bitmap, logic is flipped, 1 = unavaiable memory, 0 = available memory, while in the mmap entries 1 = available and 0 = unavailable DONT GET CONFUSED
+    while ((uint8_t*)entry < end) { // KEY POINT: In the bitmap, logic is flipped, 1 = unavaiable memory, 0 = available memory, while in the mmap entries 1 = available and 0 = unavailable DONT GET CONFUSED
         if (entry->type == 1) { // if the mmap entry is labeled free
             uint32_t first_frame = (uint32_t)entry->addr / 4096; // find the address of the first frame in this entry
             uint32_t last_frame = ((uint32_t)entry->addr + (uint32_t)entry->len) / 4096; // find the address of the second frame in this entry

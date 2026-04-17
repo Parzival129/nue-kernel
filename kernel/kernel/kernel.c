@@ -17,6 +17,8 @@ void kernel_main(uint32_t multiboot_info_addr) // accepts multiboot info address
     printf("[OK] gdt installed\n");
     idt_install();
     printf("[OK] idt installed\n");
+    PMM_initialize((multiboot_info_t*)multiboot_info_addr);
+    printf("[OK] pmm initialized\n");
 
     printf("                   __                    __\n");
     printf("  ___  __ _____   / /_____ _______  ___ / /\n");
