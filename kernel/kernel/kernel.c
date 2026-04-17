@@ -2,11 +2,14 @@
 
 #include <kernel/gdt.h>
 #include <kernel/idt.h>
+#include <kernel/multiboot.h>
+#include <kernel/pmm.h>
 #include <kernel/shell.h>
 #include <kernel/tty.h>
 
-void kernel_main(uint32_t multiboot_info_addr) // accepts multiboot info address from boot.S
+void kernel_main(uint32_t multiboot_info_addr) // accepts multiboot info address from boot.S, use this information to create the memory bitmap (what is available and what isn't)
 {
+
     terminal_initialize();
     setvbuf(stdout, NULL, _IONBF, 0); // disable stdout buffering so putchar writes immediately
     printf("[OK] terminal initialized\n");
