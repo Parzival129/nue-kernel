@@ -97,8 +97,11 @@ uint32_t pmm_alloc_frame(void) {
     return 0; // no free frames
 
 }
-void pmm_free_frame(uint32_t frame_addr) {
-
+void pmm_free_frame(uint32_t frame_addr) { // free a frame
+    uint32_t frame = frame_addr / 4096; // find the frame #
+    uint32_t byte_index = frame / 8; // get the byte index in the bitmap
+    uint8_t bit_index = frame % 8; // get the bit index of the bit in the bitmap
+    bitmap_addr[byte_index] &= ~(1 << bit_index); // free the frame by setting that frame bit to 0 in the bitmap
 }
 uint32_t pmm_get_free_frame_count(void) {
 
