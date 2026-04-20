@@ -18,6 +18,7 @@ static uint8_t terminal_color;
 static uint16_t* terminal_buffer;
 
 static bool shift_pressed = false;
+static bool extended_scancode = false;
 
 // IMPLEMENT PS/2 scancode to ASCII conversion table
 
@@ -40,13 +41,23 @@ const char ascii_shift_map[] = {
 
 char ps2_to_ascii(uint8_t scancode)
 {
+    // 0xE0 introduces a two-byte extended scancode (arrows, etc.) — consume silently
+    if (scancode == 0xE0) {
+        extended_scancode = true;
+        return 0;
+    }
+    if (extended_scancode) {
+        extended_scancode = false;
+        return 0;
+    }
+
     // Check for Break codes (Key Released)
     if (scancode & 0x80) {
         uint8_t released = scancode & 0x7F;
         if (released == 0x2A || released == 0x36) {
             shift_pressed = false;
         }
-        return 0; // Don't print anything on release
+        return 0;
     }
 
     // Check for Make codes (Key Pressed)
@@ -57,7 +68,6 @@ char ps2_to_ascii(uint8_t scancode)
         return 0;
 
     default:
-        // Ensure scancode is within our table range
         if (scancode < sizeof(ascii_map)) {
             return shift_pressed ? ascii_shift_map[scancode] : ascii_map[scancode];
         }
