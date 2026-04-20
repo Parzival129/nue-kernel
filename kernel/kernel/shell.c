@@ -1,6 +1,6 @@
 #include <kernel/shell.h>
 #include <kernel/pmm.h>
-
+#include <kernel/tty.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -18,11 +18,9 @@ static void shell_execute_command(void)
 
     if (cli_buffer_index == 4 && memcmp(cli_buffer, "info", 4) == 0) {
         printf("Nue Kernel v0.1\n");
-        
+
     } else if (cli_buffer_index == 5 && memcmp(cli_buffer, "clear", 5) == 0) {
-        for (int i = 0; i < 80 * 25; i++) {
-            printf(" ");
-        }
+        terminal_clear();
 
     } else if (cli_buffer_index == 4 && memcmp(cli_buffer, "help", 4) == 0) {
         printf("There is no help here..\n");

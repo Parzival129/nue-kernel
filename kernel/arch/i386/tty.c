@@ -170,7 +170,9 @@ void terminal_clear() {
             terminal_buffer[index] = vga_entry(' ', terminal_color);
         }
     }
-    update_cursor(0,0);
+    terminal_row = 0;
+    terminal_column = 0;
+    update_cursor(0, 0);
 }
 
 void terminal_write(const char* data, size_t size)

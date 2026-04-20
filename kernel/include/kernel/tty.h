@@ -11,5 +11,6 @@ void terminal_writestring(const char* data);
 size_t terminal_get_row(void);
 size_t terminal_get_column(void);
 char ps2_to_ascii(uint8_t scancode);
+void terminal_clear(void);
 
 #endif
